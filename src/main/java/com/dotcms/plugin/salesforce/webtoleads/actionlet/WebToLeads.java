@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.PostMethod;
+import com.dotcms.repackage.org.apache.commons.httpclient.HttpClient;
+import com.dotcms.repackage.org.apache.commons.httpclient.NameValuePair;
+import com.dotcms.repackage.org.apache.commons.httpclient.methods.PostMethod;
 
 import com.dotmarketing.beans.Host;
 import com.dotmarketing.business.APILocator;
