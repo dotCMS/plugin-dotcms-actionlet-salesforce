@@ -1,31 +1,33 @@
 Manifest-Version: 1.0
+Bundle-Description: dotCMS Salesforce Web to Leads Actionlet
+Bundle-SymbolicName: plugin-dotcms-actionlet-salesforce
+Bundle-ManifestVersion: 2
+Bnd-LastModified: 1489170485000
+Bundle-DocURL: http://www.dotcms.com
+Bundle-Vendor: dotcms
+Import-Package: com.dotcms.plugin.salesforce.webtoleads.actionlet;vers
+ ion=0,com.dotcms.repackage.org.apache.commons.httpclient;version=0,co
+ m.dotcms.repackage.org.apache.commons.httpclient.methods;version=0,co
+ m.dotmarketing.beans;version=0,com.dotmarketing.business;version=0,co
+ m.dotmarketing.cmis.proxy;version=0,com.dotmarketing.osgi;version=0,c
+ om.dotmarketing.portlets.contentlet.business;version=0,com.dotmarketi
+ ng.portlets.contentlet.model;version=0,com.dotmarketing.portlets.stru
+ cture.model;version=0,com.dotmarketing.portlets.workflows.actionlet;v
+ ersion=0,com.dotmarketing.portlets.workflows.model;version=0,com.dotm
+ arketing.util;version=0,com.liferay.portal.model;version=0,javax.serv
+ let.http;version=0,org.apache.velocity.context;version=0,org.apache.v
+ elocity.tools.view.context;version=0,org.osgi.framework;version=0
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.7))"
+DynamicImport-Package: *
+Tool: Bnd-3.2.0.201605172007
 Export-Package: com.dotcms.plugin.salesforce.webtoleads.actionlet;vers
  ion="0.1";uses:="com.dotmarketing.portlets.workflows.actionlet,com.do
  tmarketing.portlets.workflows.model",com.dotcms.plugin.salesforce.web
  toleads.osgi;version="0.1";uses:="com.dotmarketing.osgi,org.osgi.fram
  ework"
-Tool: Bnd-2.1.0.20130426-122213
 Bundle-Name: Salesforce Web to Leads Actionlet
-Created-By: 1.7.0_45 (Oracle Corporation)
-DynamicImport-Package: *
-Bundle-Vendor: dotcms
 Bundle-Version: 0.1
-Bnd-LastModified: 1413314839000
-Bundle-ManifestVersion: 2
 Bundle-Activator: com.dotcms.plugin.salesforce.webtoleads.osgi.Activat
  or
-Bundle-Description: dotCMS Salesforce Web to Leads Actionlet
-Bundle-SymbolicName: plugin-dotcms-actionlet-salesforce
-Import-Package: com.dotmarketing.beans;version=0,com.dotmarketing.busi
- ness;version=0,com.dotmarketing.cmis.proxy;version=0,com.dotmarketing
- .osgi;version=0,com.dotmarketing.portlets.contentlet.business;version
- =0,com.dotmarketing.portlets.contentlet.model;version=0,com.dotmarket
- ing.portlets.structure.model;version=0,com.dotmarketing.portlets.work
- flows.actionlet;version=0,com.dotmarketing.portlets.workflows.model;v
- ersion=0,com.dotmarketing.util;version=0,com.liferay.portal.model;ver
- sion=0,javax.servlet.http;version=0,org.apache.commons.httpclient;ver
- sion=0,org.apache.commons.httpclient.methods;version=0,org.apache.vel
- ocity.context;version=0,org.apache.velocity.tools.view.context;versio
- n=0,org.osgi.framework;version=0
-Bundle-DocURL: http://www.dotcms.com
+Created-By: 1.8.0_112 (Oracle Corporation)
 

@@ -1,6 +1,6 @@
 package com.dotcms.plugin.salesforce.webtoleads.osgi;
 
-import com.dotcms.repackage.org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleContext;
 
 
 import com.dotcms.plugin.salesforce.webtoleads.actionlet.WebToLeads;
