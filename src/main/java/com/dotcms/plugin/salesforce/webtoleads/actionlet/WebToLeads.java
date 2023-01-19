@@ -1,21 +1,16 @@
 package com.dotcms.plugin.salesforce.webtoleads.actionlet;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.dotcms.api.web.HttpServletRequestThreadLocal;
+import com.dotcms.api.web.HttpServletResponseThreadLocal;
+import com.dotcms.mock.request.FakeHttpRequest;
+import com.dotcms.mock.request.MockAttributeRequest;
+import com.dotcms.mock.request.MockSessionRequest;
+import com.dotcms.mock.response.BaseResponse;
 import com.dotcms.repackage.org.apache.commons.httpclient.HttpClient;
 import com.dotcms.repackage.org.apache.commons.httpclient.NameValuePair;
 import com.dotcms.repackage.org.apache.commons.httpclient.methods.PostMethod;
-
 import com.dotmarketing.beans.Host;
 import com.dotmarketing.business.APILocator;
-import com.dotmarketing.cmis.proxy.DotInvocationHandler;
-import com.dotmarketing.cmis.proxy.DotRequestProxy;
-import com.dotmarketing.cmis.proxy.DotResponseProxy;
 import com.dotmarketing.portlets.contentlet.model.Contentlet;
 import com.dotmarketing.portlets.workflows.actionlet.WorkFlowActionlet;
 import com.dotmarketing.portlets.workflows.model.WorkflowActionClassParameter;
@@ -26,6 +21,17 @@ import com.dotmarketing.util.DNSUtil;
 import com.dotmarketing.util.Logger;
 import com.dotmarketing.util.UtilMethods;
 import com.dotmarketing.util.VelocityUtil;
+import com.liferay.portal.model.User;
+import com.liferay.util.StringPool;
+import com.liferay.util.servlet.DynamicServletRequest;
+import io.vavr.control.Try;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WebToLeads extends WorkFlowActionlet {
 
@@ -83,23 +89,28 @@ public class WebToLeads extends WorkFlowActionlet {
 		String condition = params.get("condition").getValue();
 
 		try {
+
+			final User currentUser          = processor.getUser();
 			// get the host of the content
 			Host host = APILocator.getHostAPI().find(processor.getContentlet().getHost(), APILocator.getUserAPI().getSystemUser(), false);
 			if (host.isSystemHost()) {
 				host = APILocator.getHostAPI().findDefaultHost(APILocator.getUserAPI().getSystemUser(), false);
 			}
 
-			InvocationHandler dotInvocationHandler = new DotInvocationHandler(new HashMap());
+			final HttpServletRequest request =
+					null == HttpServletRequestThreadLocal.INSTANCE.getRequest()?
+							this.mockRequest(currentUser): HttpServletRequestThreadLocal.INSTANCE.getRequest();
+			final HttpServletResponse response =
+					null == HttpServletResponseThreadLocal.INSTANCE.getResponse()?
+							this.mockResponse(): HttpServletResponseThreadLocal.INSTANCE.getResponse();
 
-			DotRequestProxy requestProxy = (DotRequestProxy) Proxy.newProxyInstance(DotRequestProxy.class.getClassLoader(),
-					new Class[] { DotRequestProxy.class }, dotInvocationHandler);
-			requestProxy.put("host", host);
-			requestProxy.put("host_id", host.getIdentifier());
-			requestProxy.put("user", processor.getUser());
-			DotResponseProxy responseProxy = (DotResponseProxy) Proxy.newProxyInstance(DotResponseProxy.class.getClassLoader(),
-					new Class[] { DotResponseProxy.class }, dotInvocationHandler);
+			final Map requestParams = new HashMap();
+			requestParams.put("host", host);
+			requestParams.put("host_id", host.getIdentifier());
+			requestParams.put("user", processor.getUser());
+			final HttpServletRequest requestProxy = new DynamicServletRequest(request, requestParams, true);
 
-			org.apache.velocity.context.Context ctx = VelocityUtil.getWebContext(requestProxy, responseProxy);
+			org.apache.velocity.context.Context ctx = VelocityUtil.getWebContext(requestProxy, response);
 			ctx.put("host", host);
 			ctx.put("host_id", host.getIdentifier());
 			ctx.put("user", processor.getUser());
@@ -129,8 +140,6 @@ public class WebToLeads extends WorkFlowActionlet {
 
 	        HttpClient client = new HttpClient();
 
-
-
 	        PostMethod method = new PostMethod( postUrl );
 
 	        List<NameValuePair> data = new ArrayList<NameValuePair>();
@@ -146,17 +155,28 @@ public class WebToLeads extends WorkFlowActionlet {
 					}
 				}
 	        }
-	        
 
-	        
-	        
 	        method.setRequestBody( data.toArray(new NameValuePair[data.size()]));
 	        client.executeMethod( method );
-
 		} catch (Exception e) {
 			Logger.error(WebToLeads.class, e.getMessage(), e);
 		}
+	}
 
+	private HttpServletRequest  mockRequest (final User currentUser) {
+
+		final Host host = Try.of(()-> APILocator.getHostAPI()
+				.findDefaultHost(currentUser, false)).getOrElse(APILocator.systemHost());
+		return new MockAttributeRequest(
+				new MockSessionRequest(
+						new FakeHttpRequest(host.getHostname(), StringPool.FORWARD_SLASH).request()
+				).request()
+		).request();
+	}
+
+	private HttpServletResponse mockResponse () {
+
+		return new BaseResponse().response();
 	}
 
 }
