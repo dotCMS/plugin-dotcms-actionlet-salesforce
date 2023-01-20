@@ -31,6 +31,7 @@ import io.vavr.control.Try;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ import java.util.Map;
 public class WebToLeads extends WorkFlowActionlet {
 
 	private static final long serialVersionUID = 1L;
-	final String postUrl = "https://www.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8";
+	final String postUrl = "https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8";
 
 	@Override
 	public List<WorkflowActionletParameter> getParameters() {
@@ -141,9 +142,9 @@ public class WebToLeads extends WorkFlowActionlet {
 			ctx.put("nextStepResolved", processor.getNextStep().isResolved());
 			ctx.put("nextStepId", processor.getNextStep().getId());
 			ctx.put("nextStepName", processor.getNextStep().getName());
-			ctx.put("workflowTaskTitle", UtilMethods.isSet(processor.getTask().getTitle()) ? processor.getTask().getTitle() : processor
-					.getContentlet().getTitle());
-			ctx.put("modDate", processor.getTask().getModDate());
+			ctx.put("workflowTaskTitle", Try.of(()->UtilMethods.isSet(processor.getTask().getTitle()) ? processor.getTask().getTitle() : processor
+					.getContentlet().getTitle()).getOrElse("Untitled"));
+			ctx.put("modDate", Try.of(()->processor.getTask().getModDate()).getOrElse(new Date()));
 			ctx.put("structureName", processor.getContentlet().getStructure().getName());
 
 			ctx.put("contentlet", c);
