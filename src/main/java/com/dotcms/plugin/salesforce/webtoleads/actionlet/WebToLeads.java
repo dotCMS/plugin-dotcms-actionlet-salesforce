@@ -3,8 +3,10 @@ package com.dotcms.plugin.salesforce.webtoleads.actionlet;
 import com.dotcms.api.web.HttpServletRequestThreadLocal;
 import com.dotcms.api.web.HttpServletResponseThreadLocal;
 import com.dotcms.mock.request.FakeHttpRequest;
+import com.dotcms.mock.request.HttpServletRequestParameterDecoratorWrapper;
 import com.dotcms.mock.request.MockAttributeRequest;
 import com.dotcms.mock.request.MockSessionRequest;
+import com.dotcms.mock.request.ParameterDecorator;
 import com.dotcms.mock.response.BaseResponse;
 import com.dotcms.repackage.org.apache.commons.httpclient.HttpClient;
 import com.dotcms.repackage.org.apache.commons.httpclient.NameValuePair;
@@ -71,6 +73,26 @@ public class WebToLeads extends WorkFlowActionlet {
 		return "This actionlet will post content from a form entry to your Salesforce leads list. The value of every field here is parsed velocity.  So, if your content has a field, 'userEmail' to set this to Salesforce's email, use $content.userEmail in the 'Email' field and the system will replace it with the variables from the content";
 	}
 
+	private class SimpleKeyValueParameterDecorator implements ParameterDecorator {
+
+		private final String key;
+		private final String value;
+
+		public SimpleKeyValueParameterDecorator(String key, String value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		@Override
+		public String key() {
+			return key;
+		}
+
+		@Override
+		public String decorate(String s) {
+			return null!= s? s:value;
+		}
+	}
 	@Override
 	public void executeAction(WorkflowProcessor processor, Map<String, WorkflowActionClassParameter> params)
 			throws WorkflowActionFailureException {
@@ -104,11 +126,8 @@ public class WebToLeads extends WorkFlowActionlet {
 					null == HttpServletResponseThreadLocal.INSTANCE.getResponse()?
 							this.mockResponse(): HttpServletResponseThreadLocal.INSTANCE.getResponse();
 
-			final Map requestParams = new HashMap();
-			requestParams.put("host", host);
-			requestParams.put("host_id", host.getIdentifier());
-			requestParams.put("user", processor.getUser());
-			final HttpServletRequest requestProxy = new DynamicServletRequest(request, requestParams, true);
+			final HttpServletRequest requestProxy = new HttpServletRequestParameterDecoratorWrapper(request,
+					new SimpleKeyValueParameterDecorator("host_id", host.getIdentifier()));
 
 			org.apache.velocity.context.Context ctx = VelocityUtil.getWebContext(requestProxy, response);
 			ctx.put("host", host);
