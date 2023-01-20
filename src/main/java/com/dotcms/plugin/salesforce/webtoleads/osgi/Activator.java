@@ -1,10 +1,10 @@
 package com.dotcms.plugin.salesforce.webtoleads.osgi;
 
-import com.dotcms.repackage.org.osgi.framework.BundleContext;
 
 
 import com.dotcms.plugin.salesforce.webtoleads.actionlet.WebToLeads;
 import com.dotmarketing.osgi.GenericBundleActivator;
+import org.osgi.framework.BundleContext;
 
 
 public class Activator extends GenericBundleActivator {
